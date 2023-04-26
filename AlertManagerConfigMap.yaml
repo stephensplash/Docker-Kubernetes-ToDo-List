@@ -1,0 +1,33 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: alertmanager-config
+data:
+  config.yml: |-
+    global:
+    templates:
+    - '/etc/alertmanager/*.tmpl'
+    route:
+      receiver: alert-emailer
+      group_by: ['alertname', 'priority']
+      group_wait: 10s
+      repeat_interval: 30m
+      routes:
+        - receiver: slack_demo
+        # Send severity=slack alerts to slack.
+          match:
+            severity: slack
+          group_wait: 10s
+          repeat_interval: 1m
+    receivers:
+    - name: alert-emailer
+      email_configs:
+      - to: alfonsolv3@gmail.com
+        send_resolved: false
+        from: alfonsolv3@gmail.com
+        smarthost: smtp.eample.com:25
+        require_tls: false
+    - name: slack_demo
+      slack_configs:
+      - api_url: https://hooks.slack.com/services/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
+        channel: '#general'
